@@ -110,6 +110,27 @@ export function App() {
     setParseInfo('');
   };
 
+  const handleDownload = () => {
+    if (!output) return;
+    const extension = outputFormat === 'json' ? 'json' : 'tsx';
+    const mimeType =
+      outputFormat === 'json' ? 'application/json' : 'text/plain';
+    const now = new Date();
+    const pad = (value: number) => value.toString().padStart(2, '0');
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(
+      now.getDate()
+    )}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const blob = new Blob([output], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nextjs-script-parser-${timestamp}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const sampleInput = `self.__next_f.push([1, "4c:\\"$Sreact.suspense\\"\\n"])`;
 
   return (
@@ -223,12 +244,20 @@ export function App() {
             />
 
             {output && (
-              <button
-                onClick={() => navigator.clipboard.writeText(output)}
-                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Copy to Clipboard
-              </button>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  onClick={() => navigator.clipboard.writeText(output)}
+                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Copy to Clipboard
+                </button>
+                <button
+                  onClick={handleDownload}
+                  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Download File
+                </button>
+              </div>
             )}
           </div>
         </div>
