@@ -162,7 +162,7 @@ export function App() {
               value={input}
               onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
               placeholder="Paste the content of Next.js script element here..."
-              class="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
 
             <div class="flex gap-2">
@@ -239,7 +239,7 @@ export function App() {
             <textarea
               value={output}
               readOnly
-              class="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm resize-none bg-gray-50"
+              class="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm resize-none bg-gray-50 focus:outline-none"
               placeholder="Parse results will be displayed here..."
             />
 
