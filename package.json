@@ -1,0 +1,28 @@
+{
+  "name": "nextjs-script-parser",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "esbuild"
+    ]
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.12",
+    "lucide-preact": "^0.544.0",
+    "preact": "^10.27.1",
+    "tailwindcss": "^4.1.12"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.2",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.4"
+  }
+}
