@@ -110,7 +110,7 @@ export function App() {
     setParseInfo('');
   };
 
-  const sampleInput = `self.__next_f.push([1, "4c:\"$Sreact.suspense\"\n"])`;
+  const sampleInput = `self.__next_f.push([1, "4c:\\"$Sreact.suspense\\"\\n"])`;
 
   return (
     <div class="min-h-screen bg-gray-50 p-4">
