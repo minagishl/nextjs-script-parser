@@ -191,7 +191,7 @@ export function App() {
               <h2 class="text-xl font-semibold text-gray-800">Input</h2>
               <button
                 onClick={() => setInput(sampleInput)}
-                class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors cursor-pointer"
               >
                 Use Sample
               </button>
@@ -207,13 +207,13 @@ export function App() {
             <div class="flex gap-2">
               <button
                 onClick={handleParse}
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
               >
                 Parse
               </button>
               <button
                 onClick={handleClear}
-                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors cursor-pointer"
               >
                 Clear
               </button>
@@ -226,7 +226,7 @@ export function App() {
               <div class="flex gap-2">
                 <button
                   onClick={() => setOutputFormat('json')}
-                  class={`px-3 py-1 text-sm rounded transition-colors ${
+                  class={`px-3 py-1 text-sm rounded transition-colors cursor-pointer ${
                     outputFormat === 'json'
                       ? 'bg-green-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -236,7 +236,7 @@ export function App() {
                 </button>
                 <button
                   onClick={() => setOutputFormat('react')}
-                  class={`px-3 py-1 text-sm rounded transition-colors ${
+                  class={`px-3 py-1 text-sm rounded transition-colors cursor-pointer ${
                     outputFormat === 'react'
                       ? 'bg-green-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -286,13 +286,13 @@ export function App() {
               <div class="flex flex-wrap gap-2">
                 <button
                   onClick={() => navigator.clipboard.writeText(output)}
-                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
                 >
                   Copy to Clipboard
                 </button>
                 <button
                   onClick={handleDownload}
-                  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                 >
                   Download File
                 </button>
