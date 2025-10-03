@@ -6,7 +6,9 @@ export function App() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [outputFormat, setOutputFormat] = useState<'json' | 'react'>('json');
-  const [parseStatus, setParseStatus] = useState<'idle' | 'parsing' | 'success' | 'error'>('idle');
+  const [parseStatus, setParseStatus] = useState<
+    'idle' | 'parsing' | 'success' | 'error'
+  >('idle');
   const [parseInfo, setParseInfo] = useState<string>('');
 
   const parser = new NextJSScriptParser();
@@ -20,33 +22,47 @@ export function App() {
 
       if (aggregate.totalScripts === 0) {
         setParseStatus('error');
-        setParseInfo('No self.__next_f.push(...) calls found in the provided input.');
-        setOutput('No Next.js script payloads detected. Paste the contents of <head> or relevant script tags.');
+        setParseInfo(
+          'No self.__next_f.push(...) calls found in the provided input.'
+        );
+        setOutput(
+          'No Next.js script payloads detected. Paste the contents of <head> or relevant script tags.'
+        );
         return;
       }
 
       const failureDetails = aggregate.results
-        .filter(result => !result.success)
-        .map(result => {
+        .filter((result) => !result.success)
+        .map((result) => {
           const reason = result.error || 'Unknown error';
-          const typeHint = result.dataType === 'module-loading' ? ' (module-loading payload)' : '';
-          return `#${result.index + 1}: ${reason}${typeHint}\n   Snippet: ${result.snippetPreview}`;
+          const typeHint =
+            result.dataType === 'module-loading'
+              ? ' (module-loading payload)'
+              : '';
+          return `#${result.index + 1}: ${reason}${typeHint}\n   Snippet: ${
+            result.snippetPreview
+          }`;
         })
         .join('\n\n');
 
-      const moduleSummary = aggregate.moduleLoadingCount > 0
-        ? ` ${aggregate.moduleLoadingCount} call(s) contained module/chunk metadata and were skipped.`
-        : '';
+      const moduleSummary =
+        aggregate.moduleLoadingCount > 0
+          ? ` ${aggregate.moduleLoadingCount} call(s) contained module/chunk metadata and were skipped.`
+          : '';
 
       if (aggregate.successCount > 0) {
         setParseStatus('success');
         const summary = `Parsed ${aggregate.successCount} / ${aggregate.totalScripts} self.__next_f.push call(s). Extracted ${aggregate.combinedComponents.length} component node(s).`;
-        const warning = aggregate.failureCount > 0 ? ` ${aggregate.failureCount} call(s) could not be parsed.` : '';
+        const warning =
+          aggregate.failureCount > 0
+            ? ` ${aggregate.failureCount} call(s) could not be parsed.`
+            : '';
         setParseInfo(summary + warning + moduleSummary);
 
-        const baseOutput = outputFormat === 'json'
-          ? parser.formatAsReadableJson(aggregate.combinedComponents)
-          : parser.formatAsReactComponents(aggregate.combinedComponents);
+        const baseOutput =
+          outputFormat === 'json'
+            ? parser.formatAsReadableJson(aggregate.combinedComponents)
+            : parser.formatAsReactComponents(aggregate.combinedComponents);
 
         if (aggregate.failureCount > 0) {
           setOutput(`${baseOutput}\n\nFailures:\n${failureDetails}`);
@@ -59,18 +75,29 @@ export function App() {
 
       if (aggregate.moduleLoadingCount > 0 && aggregate.failureCount === 0) {
         setParseStatus('success');
-        setParseInfo(`Detected ${aggregate.moduleLoadingCount} module/chunk payload(s); no React component data found.`);
-        setOutput('All detected payloads were module/chunk metadata (no components to render).');
+        setParseInfo(
+          `Detected ${aggregate.moduleLoadingCount} module/chunk payload(s); no React component data found.`
+        );
+        setOutput(
+          'All detected payloads were module/chunk metadata (no components to render).'
+        );
         return;
       }
 
       setParseStatus('error');
-      setParseInfo('Unable to parse any self.__next_f.push call from the input.');
-      const fallback = [failureDetails, moduleSummary.trim()].filter(Boolean).join('\n\n');
-      setOutput(fallback || 'All detected script payloads were non-component data.');
+      setParseInfo(
+        'Unable to parse any self.__next_f.push call from the input.'
+      );
+      const fallback = [failureDetails, moduleSummary.trim()]
+        .filter(Boolean)
+        .join('\n\n');
+      setOutput(
+        fallback || 'All detected script payloads were non-component data.'
+      );
     } catch (error) {
       setParseStatus('error');
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       setParseInfo(`Unexpected error: ${errorMessage}`);
       setOutput(`Unexpected Error: ${errorMessage}`);
     }
@@ -89,8 +116,13 @@ export function App() {
     <div class="min-h-screen bg-gray-50 p-4">
       <div class="max-w-6xl mx-auto">
         <header class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">Next.js Script Parser</h1>
-          <p class="text-gray-600">A tool to parse and convert data from Next.js &lt;script&gt; elements</p>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            Next.js Script Parser
+          </h1>
+          <p class="text-gray-600">
+            A tool to parse and convert data from Next.js &lt;script&gt;
+            elements
+          </p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -156,17 +188,24 @@ export function App() {
             </div>
 
             {parseInfo && (
-              <div class={`p-3 rounded-lg text-sm ${
-                parseStatus === 'success'
-                  ? 'bg-green-100 text-green-800 border border-green-200'
-                  : parseStatus === 'error'
-                  ? 'bg-red-100 text-red-800 border border-red-200'
-                  : 'bg-blue-100 text-blue-800 border border-blue-200'
-              }`}>
+              <div
+                class={`p-3 rounded-lg text-sm ${
+                  parseStatus === 'success'
+                    ? 'bg-green-100 text-green-800 border border-green-200'
+                    : parseStatus === 'error'
+                    ? 'bg-red-100 text-red-800 border border-red-200'
+                    : 'bg-blue-100 text-blue-800 border border-blue-200'
+                }`}
+              >
                 <div class="flex items-center gap-2">
-                  {parseStatus === 'parsing' && <div class="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>}
+                  {parseStatus === 'parsing' && (
+                    <div class="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                  )}
                   {parseStatus === 'success' && (
-                    <CheckCircle2 class="h-5 w-5 text-green-600" aria-hidden="true" />
+                    <CheckCircle2
+                      class="h-5 w-5 text-green-600"
+                      aria-hidden="true"
+                    />
                   )}
                   {parseStatus === 'error' && (
                     <XCircle class="h-5 w-5 text-red-600" aria-hidden="true" />

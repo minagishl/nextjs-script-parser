@@ -51,7 +51,7 @@ export class NextJSScriptParser {
         failureCount: 0,
         moduleLoadingCount: 0,
         results: [],
-        combinedComponents: []
+        combinedComponents: [],
       };
     }
 
@@ -69,13 +69,17 @@ export class NextJSScriptParser {
       results.push({
         ...parseResult,
         index,
-        snippetPreview
+        snippetPreview,
       });
     });
 
-    const successCount = results.filter(result => result.success && result.dataType === 'component-data').length;
-    const moduleLoadingCount = results.filter(result => result.dataType === 'module-loading').length;
-    const failureCount = results.filter(result => !result.success).length;
+    const successCount = results.filter(
+      (result) => result.success && result.dataType === 'component-data'
+    ).length;
+    const moduleLoadingCount = results.filter(
+      (result) => result.dataType === 'module-loading'
+    ).length;
+    const failureCount = results.filter((result) => !result.success).length;
 
     return {
       totalScripts: results.length,
@@ -83,7 +87,7 @@ export class NextJSScriptParser {
       failureCount,
       moduleLoadingCount,
       results,
-      combinedComponents
+      combinedComponents,
     };
   }
 
@@ -97,14 +101,20 @@ export class NextJSScriptParser {
 
       // Step 2: Parse as JSON
       const parsedData = JSON.parse(cleanContent);
-      console.log('Parsed JSON structure:', Array.isArray(parsedData) ? 'Array' : typeof parsedData, 'Length:', Array.isArray(parsedData) ? parsedData.length : 'N/A');
+      console.log(
+        'Parsed JSON structure:',
+        Array.isArray(parsedData) ? 'Array' : typeof parsedData,
+        'Length:',
+        Array.isArray(parsedData) ? parsedData.length : 'N/A'
+      );
 
       if (!Array.isArray(parsedData) || parsedData.length < 2) {
         return {
           success: false,
           components: [],
-          error: 'Invalid data structure: Expected array with at least 2 elements',
-          debugInfo: `Got: ${JSON.stringify(parsedData).substring(0, 100)}...`
+          error:
+            'Invalid data structure: Expected array with at least 2 elements',
+          debugInfo: `Got: ${JSON.stringify(parsedData).substring(0, 100)}...`,
         };
       }
 
@@ -113,7 +123,10 @@ export class NextJSScriptParser {
       console.log('Component data type:', typeof componentData);
 
       if (typeof componentData === 'string') {
-        console.log('Component data preview:', componentData.substring(0, 100) + '...');
+        console.log(
+          'Component data preview:',
+          componentData.substring(0, 100) + '...'
+        );
 
         // Detect data type
         const dataType = this.detectDataType(componentData);
@@ -124,23 +137,33 @@ export class NextJSScriptParser {
             success: true,
             components: [],
             dataType: 'module-loading',
-            debugInfo: `Data starts with: ${componentData.substring(0, 50)}...`
+            debugInfo: `Data starts with: ${componentData.substring(0, 50)}...`,
           };
         }
 
         if (dataType === 'component-data' && componentData.includes(':')) {
           const colonIndex = componentData.indexOf(':');
           const dataAfterColon = componentData.substring(colonIndex + 1);
-          console.log('Extracting after colon:', dataAfterColon.substring(0, 100) + '...');
+          console.log(
+            'Extracting after colon:',
+            dataAfterColon.substring(0, 100) + '...'
+          );
           try {
             componentData = JSON.parse(dataAfterColon);
           } catch (parseError) {
-            console.error('Failed to parse component data after colon:', parseError);
+            console.error(
+              'Failed to parse component data after colon:',
+              parseError
+            );
             return {
               success: false,
               components: [],
               error: 'Failed to parse component data structure',
-              debugInfo: `Parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`
+              debugInfo: `Parse error: ${
+                parseError instanceof Error
+                  ? parseError.message
+                  : 'Unknown error'
+              }`,
             };
           }
         } else if (dataType === 'component-data') {
@@ -149,8 +172,10 @@ export class NextJSScriptParser {
             if (typeof componentData === 'string') {
               componentData = JSON.parse(componentData);
             }
-          } catch (parseError) {
-            console.log('Component data is already in correct format or not JSON string');
+          } catch {
+            console.log(
+              'Component data is already in correct format or not JSON string'
+            );
           }
         }
       }
@@ -162,23 +187,25 @@ export class NextJSScriptParser {
       return {
         success: true,
         components,
-        dataType: 'component-data'
+        dataType: 'component-data',
       };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       console.error('Parse error:', errorMessage);
 
       return {
         success: false,
         components: [],
         error: `Parse failed: ${errorMessage}`,
-        debugInfo: `Input length: ${scriptContent.length}, Error at parsing stage`
+        debugInfo: `Input length: ${scriptContent.length}, Error at parsing stage`,
       };
     }
   }
 
-  private detectDataType(data: string): 'component-data' | 'module-loading' | 'unknown' {
+  private detectDataType(
+    data: string
+  ): 'component-data' | 'module-loading' | 'unknown' {
     // Module loading data typically starts with patterns like "1f:", "1e:", etc.
     // and contains file paths
     if (/^[0-9a-f]+:I\[/.test(data) || data.includes('static/chunks/')) {
@@ -246,7 +273,11 @@ export class NextJSScriptParser {
 
     for (const item of data) {
       if (typeof item === 'string') {
-        results.push({ type: 'text', component: 'text', props: { content: item } });
+        results.push({
+          type: 'text',
+          component: 'text',
+          props: { content: item },
+        });
       } else if (Array.isArray(item)) {
         const parsed = this.parseComponent(item);
         if (parsed) {
@@ -273,7 +304,7 @@ export class NextJSScriptParser {
     const result: ParsedComponent = {
       type: 'component',
       component: componentType,
-      props: { ...props }
+      props: { ...props },
     };
 
     if (props.children) {
@@ -327,10 +358,15 @@ export class NextJSScriptParser {
   }
 
   formatAsReactComponents(components: ParsedComponent[]): string {
-    return components.map(comp => this.componentToReactString(comp)).join('\n');
+    return components
+      .map((comp) => this.componentToReactString(comp))
+      .join('\n');
   }
 
-  private componentToReactString(component: ParsedComponent, indent = 0): string {
+  private componentToReactString(
+    component: ParsedComponent,
+    indent = 0
+  ): string {
     const spaces = '  '.repeat(indent);
 
     if (component.type === 'text') {
@@ -349,14 +385,15 @@ export class NextJSScriptParser {
         }
       });
 
-    const propsString = propStrings.length > 0 ? ' ' + propStrings.join(' ') : '';
+    const propsString =
+      propStrings.length > 0 ? ' ' + propStrings.join(' ') : '';
 
     if (!component.children || component.children.length === 0) {
       return `${spaces}<${component.component}${propsString} />`;
     }
 
     const childrenString = component.children
-      .map(child => {
+      .map((child) => {
         if (typeof child === 'string') {
           return `${'  '.repeat(indent + 1)}${JSON.stringify(child)}`;
         }
@@ -441,7 +478,7 @@ export class NextJSScriptParser {
         continue;
       }
 
-      if (char === '"' || char === '\'' || char === '`') {
+      if (char === '"' || char === "'" || char === '`') {
         inString = true;
         stringChar = char;
         continue;
