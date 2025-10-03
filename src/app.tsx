@@ -1,6 +1,7 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { CheckCircle2, XCircle } from 'lucide-preact';
 import { NextJSScriptParser } from './parser';
+import type { AggregatedParseResult } from './parser';
 
 export function App() {
   const [input, setInput] = useState('');
@@ -10,8 +11,42 @@ export function App() {
     'idle' | 'parsing' | 'success' | 'error'
   >('idle');
   const [parseInfo, setParseInfo] = useState<string>('');
+  const [lastAggregate, setLastAggregate] =
+    useState<AggregatedParseResult | null>(null);
+  const [lastFailureDetails, setLastFailureDetails] = useState('');
 
   const parser = new NextJSScriptParser();
+
+  const buildFormattedOutput = (
+    aggregate: AggregatedParseResult,
+    format: 'json' | 'react',
+    failureDetails: string
+  ) => {
+    const baseOutput =
+      format === 'json'
+        ? parser.formatAsReadableJson(aggregate.combinedComponents)
+        : parser.formatAsReactComponents(aggregate.combinedComponents);
+
+    if (aggregate.failureCount > 0 && failureDetails) {
+      return `${baseOutput}\n\nFailures:\n${failureDetails}`;
+    }
+
+    return baseOutput;
+  };
+
+  useEffect(() => {
+    if (
+      parseStatus !== 'success' ||
+      !lastAggregate ||
+      lastAggregate.successCount === 0
+    ) {
+      return;
+    }
+
+    setOutput(
+      buildFormattedOutput(lastAggregate, outputFormat, lastFailureDetails)
+    );
+  }, [lastAggregate, lastFailureDetails, outputFormat, parseStatus]);
 
   const handleParse = () => {
     setParseStatus('parsing');
@@ -28,6 +63,8 @@ export function App() {
         setOutput(
           'No Next.js script payloads detected. Paste the contents of <head> or relevant script tags.'
         );
+        setLastAggregate(null);
+        setLastFailureDetails('');
         return;
       }
 
@@ -58,17 +95,11 @@ export function App() {
             ? ` ${aggregate.failureCount} call(s) could not be parsed.`
             : '';
         setParseInfo(summary + warning + moduleSummary);
-
-        const baseOutput =
-          outputFormat === 'json'
-            ? parser.formatAsReadableJson(aggregate.combinedComponents)
-            : parser.formatAsReactComponents(aggregate.combinedComponents);
-
-        if (aggregate.failureCount > 0) {
-          setOutput(`${baseOutput}\n\nFailures:\n${failureDetails}`);
-        } else {
-          setOutput(baseOutput);
-        }
+        setLastAggregate(aggregate);
+        setLastFailureDetails(failureDetails);
+        setOutput(
+          buildFormattedOutput(aggregate, outputFormat, failureDetails)
+        );
 
         return;
       }
@@ -81,6 +112,8 @@ export function App() {
         setOutput(
           'All detected payloads were module/chunk metadata (no components to render).'
         );
+        setLastAggregate(null);
+        setLastFailureDetails('');
         return;
       }
 
@@ -94,12 +127,16 @@ export function App() {
       setOutput(
         fallback || 'All detected script payloads were non-component data.'
       );
+      setLastAggregate(null);
+      setLastFailureDetails('');
     } catch (error) {
       setParseStatus('error');
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       setParseInfo(`Unexpected error: ${errorMessage}`);
       setOutput(`Unexpected Error: ${errorMessage}`);
+      setLastAggregate(null);
+      setLastFailureDetails('');
     }
   };
 
@@ -108,6 +145,8 @@ export function App() {
     setOutput('');
     setParseStatus('idle');
     setParseInfo('');
+    setLastAggregate(null);
+    setLastFailureDetails('');
   };
 
   const handleDownload = () => {
